@@ -1,0 +1,6 @@
+set const
+set nowrap
+set smarthome
+set smooth
+set tabsize 4
+set tabstospaces

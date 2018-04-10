@@ -1,0 +1,2 @@
+$index = Get-NetAdapter -Name Ethernet | Where-Object {$_.Name -eq "Ethernet"} | Select-Object -ExpandProperty ifIndex
+Set-DNSClientServerAddress -InterfaceIndex $index -ServerAddresses ("8.8.8.8","8.8.4.4")

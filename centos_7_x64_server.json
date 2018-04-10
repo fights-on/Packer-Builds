@@ -1,0 +1,125 @@
+{
+    "variables": {
+        "iso": "http://mirrors.ocf.berkeley.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso",
+        "iso_checksum": "bba314624956961a2ea31dd460cd860a77911c1e0a56e4820a12b9c5dad363f5",
+        "iso_checksum_type": "sha256",
+        "ssh_username": "root",
+        "ssh_password": "toor"
+    },
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "iso_url": "{{ user `iso` }}",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "vm_name": "CentOS-7-Base",
+            "guest_os_type": "RedHat_64",
+            "ssh_username": "{{ user `ssh_username` }}",
+            "ssh_password": "{{ user `ssh_password` }}",
+            "ssh_port": 22,
+            "ssh_wait_timeout": "600s",
+            "vboxmanage": [
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--memory",
+                    "1024"
+                ],
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--cpus",
+                    "2"
+                ],
+                [
+                    "modifyvm",
+                    "{{ .Name }}",
+                    "--audio",
+                    "none"
+                ]
+            ],
+            "disk_size": "20480",
+            "http_directory": "Unattended",
+            "boot_command": [
+                "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>"
+            ],
+            "shutdown_command": "/sbin/halt -p",
+            "communicator": "ssh"
+        },
+        {
+            "type": "vmware-iso",
+            "iso_url": "{{ user `iso` }}",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "vm_name": "CentOS-7-Base",
+            "guest_os_type": "centos-64",
+            "headless": false,
+            "ssh_username": "{{ user `ssh_username` }}",
+            "ssh_password": "{{ user `ssh_password` }}",
+            "ssh_port": 22,
+            "ssh_wait_timeout": "600s",
+            "vnc_port_min": 5900,
+            "vnc_port_max": 5980,
+            "version": 11,
+            "vmx_data": {
+                "memsize": "1024",
+                "numvcpus": "1",
+                "cpuid.coresPerSocket": "2",
+                "scsi0.virtualDev": "lsisas1068"
+            },
+            "disk_size": "20480",
+            "http_directory": "Unattended",
+            "boot_command": [
+                "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos_ks.cfg<enter><wait>"
+            ],
+            "shutdown_command": "/sbin/halt -p",
+            "communicator": "ssh",
+            "tools_upload_flavor": "linux"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "remote_path": "/root/centos_update.sh",
+            "expect_disconnect": true,
+            "scripts": [
+                "./Scripts/centos_update.sh"
+            ]
+        },
+        {
+            "type": "file",
+            "source": "./Files/centos_bashrc_root",
+            "destination": "/root/.bashrc"
+        },
+        {
+            "type": "file",
+            "source": "./Files/centos_bashrc_cpt",
+            "destination": "/home/cpt/.bashrc"
+        },
+        {
+            "type": "file",
+            "source": "./Files/nanorc",
+            "destination": "/root/.nanorc"
+        },
+        {
+            "type": "file",
+            "source": "./Files/nanorc",
+            "destination": "/home/cpt/.nanorc"
+        },
+        {
+            "type": "shell",
+            "remote_path": "/root/centos_bootstrap.sh",
+            "scripts": [
+                "./Scripts/centos_bootstrap.sh"
+            ]
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "compress",
+            "format": ".zip",
+            "compression_level": 9,
+            "output": "./Output/centos_7_x64_server.zip"
+        }
+    ]
+}
