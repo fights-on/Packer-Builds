@@ -29,8 +29,8 @@ chmod +x /usr/bin/update
 sudo mv /tmp/.bashrc /root/.bashrc
 sudo mv /tmp/.nanorc /root/.nanorc
 echo "Applying .bashrc's..."
-sudo chown $USER:$USER /home/$USER/.bashrc
-sudo chown $USER:$USER /home/$USER/.nanorc
+sudo chown $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.bashrc
+sudo chown $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.nanorc
 sudo chown root:root /root/.bashrc
 sudo chown root:root /root/.nanorc
 
