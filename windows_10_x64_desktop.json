@@ -2,24 +2,26 @@
   "builders": [
     {
 			"type": "virtualbox-iso",
-      "boot_wait": "2m",
+      "boot_wait": "6m",
       "communicator": "winrm",
       "disk_size": "61440",
       "floppy_files": [
 				"./Files/oracle-cert.cer",
         "./Files/WindowsPowershell.lnk",
+				"./Scripts/10_fix_network.ps1",
+				"./Scripts/10_make_windows10_great_again.bat",
+				"./Scripts/win_disable_screensaver.ps1",
         "./Scripts/win_disable_winrm.ps1",
-        "./Scripts/win_fix_dns.ps1",
         "./Scripts/win_enable_microsoft_updates.ps1",
-        "./Scripts/win_disable_screensaver.ps1",
+				"./Scripts/win_enable_winrm.ps1",
+        "./Scripts/win_fix_dns.ps1",
         "./Scripts/win_updates.ps1",
-        "./Scripts/win_enable_winrm.ps1",
-        "./Software/PinTo10.exe",
-				"./Unattended/2016/autounattend.xml"
+				"./Software/PinTo10.exe",
+				"./Unattended/10/Autounattend.xml"
       ],
       "guest_additions_mode": "attach",
-      "guest_os_type": "Windows2016_64",
-      "headless": "{{ user `headless`}}",
+      "guest_os_type": "Windows10_64",
+      "headless": "{{user `headless`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
@@ -27,39 +29,41 @@
       "vboxmanage": [
         [ "modifyvm", "{{.Name}}", "--memory", "2048" ],
         [ "modifyvm", "{{.Name}}", "--cpus", "2" ],
-        [ "modifyvm", "{{.Name}}", "--vram", "32" ]
+				[ "modifyvm", "{{.Name}}", "--vram", "32" ]
       ],
-			"vm_name": "Windows_2016_x64_Server_Base",
+      "vm_name": "Windows_10_x64_Desktop_Base",
       "winrm_password": "{{user `winrm_password`}}",
       "winrm_timeout": "4h",
       "winrm_username": "{{user `winrm_username`}}"
     },
 		{
 			"type": "vmware-iso",
-      "boot_wait": "2m",
+      "boot_wait": "6m",
       "communicator": "winrm",
       "disk_size": "61440",
-      "floppy_files": [
+			"floppy_files": [
 				"./Files/oracle-cert.cer",
         "./Files/WindowsPowershell.lnk",
+				"./Scripts/10_fix_network.ps1",
+				"./Scripts/10_make_windows10_great_again.bat",
+				"./Scripts/win_disable_screensaver.ps1",
         "./Scripts/win_disable_winrm.ps1",
-        "./Scripts/win_fix_dns.ps1",
         "./Scripts/win_enable_microsoft_updates.ps1",
-        "./Scripts/win_disable_screensaver.ps1",
+				"./Scripts/win_enable_winrm.ps1",
+        "./Scripts/win_fix_dns.ps1",
         "./Scripts/win_updates.ps1",
-        "./Scripts/win_enable_winrm.ps1",
-        "./Software/PinTo10.exe",
-				"./Unattended/2016/autounattend.xml"
+				"./Software/PinTo10.exe",
+				"./Unattended/10/Autounattend.xml"
       ],
-      "guest_os_type": "Windows2016_64",
-      "headless": "{{ user `headless`}}",
+      "guest_os_type": "Windows10-64",
+      "headless": "{{user `headless`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
 			"tools_upload_flavor": "Windows",
       "version": "12",
-			"vm_name": "Windows_2016_x64_Server_Base",
+			"vm_name": "Windows_10_x64_Desktop_Base",
 			"vmx_data": {
         "cpuid.coresPerSocket": "2",
         "memsize": "2048",
@@ -74,7 +78,7 @@
     }
   ],
   "provisioners": [
-    {
+		{
 			"type": "file",
       "destination": "c:/Windows/Temp/sdelete64.exe",
       "source": "./Software/sdelete64.exe"
@@ -102,26 +106,33 @@
     {
 			"type": "powershell",
       "scripts": [
-        "./Scripts/win_compile_dotnet_assemblies.ps1",
+				"./Scripts/10_rearm_windows.ps1",
+        "./Scripts/win_set_winrm_automatic.ps1",
         "./Scripts/win_install_chocolatey.ps1",
         "./Scripts/win_install_apps.ps1",
-        "./Scripts/win_install_update_script.ps1",
-				"./Scripts/win_set_winrm_automatic.ps1",
-				"./Scripts/win_uac_enable.ps1",
-				"./Scripts/win_vm_guest_tools.ps1"
+        "./Scripts/win_vm_guest_tools.ps1"
       ]
     },
     {
+      "type": "windows-restart"
+    },
+    {
 			"type": "windows-shell",
-      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+			"execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "remote_path": "/tmp/script.bat",
       "scripts": [
-        "./Scripts/win_pin_powershell.bat",
-        "./Scripts/2016_make_windows10_great_again.bat"
+        "./Scripts/win_pin_powershell.bat"
       ]
     },
     {
 			"type": "powershell",
-      "scripts": [ "./Scripts/win_compact.ps1" ]
+			"scripts": [
+        "./Scripts/10_debloat_windows.ps1",
+        "./Scripts/10_make_windows10_great_again.ps1",
+        "./Scripts/win_compile_dotnet_assemblies.ps1",
+				"./Scripts/10_set_powerplan.ps1",
+        "./Scripts/win_compact.ps1"
+      ]
     }
   ],
 	"post-processors": [
@@ -129,15 +140,15 @@
 			"type": "compress",
       "compression_level": "9",
       "format": ".zip",
-      "output": "./Output/windows_2016_x64_server.zip"
+      "output": "./Output/windows_10_x64_desktop.zip"
     }
   ],
   "variables": {
 		"headless": "false",
-    "iso_checksum": "1CE702A578A3CB1AC3D14873980838590F06D5B7101C5DAACCBAC9D73F1FB50F",
+		"iso_checksum": "3D39DD9BD37DB5B3C80801AE44003802A9C770A7400A1B33027CA474A1A7C691",
     "iso_checksum_type": "sha256",
-    "iso_url": "http://download.microsoft.com/download/1/4/9/149D5452-9B29-4274-B6B3-5361DBDA30BC/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO",
-    "winrm_password": "rotartsinimdA1234!@#$",
-    "winrm_username": "Administrator"
+    "iso_url": "http://care.dlservice.microsoft.com/dl/download/6/5/D/65D18931-F626-4A35-AD5B-F5DA41FE6B76/16299.15.170928-1534.rs3_release_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+    "winrm_password": "renwo1234!@#$",
+    "winrm_username": "owner"
   }
 }
