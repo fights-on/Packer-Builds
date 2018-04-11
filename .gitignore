@@ -1,4 +1,3 @@
 packer_cache*
-Output/*
 output-vmware-iso*
 output-virtualbox-iso*
