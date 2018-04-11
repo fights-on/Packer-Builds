@@ -1,108 +1,114 @@
 {
-  "builders": [
-    {
-      "type": "virtualbox-iso",
-      "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>" ],
-      "communicator": "ssh",
-      "disk_size": "20480",
-      "guest_os_type": "RedHat_64",
-      "headless": "{{ user `headless`}}",
-      "http_directory": "Unattended",
-      "iso_checksum": "{{ user `iso_checksum` }}",
-      "iso_checksum_type": "{{ user `iso_checksum_type` }}",
-      "iso_url": "{{ user `iso` }}",
-      "shutdown_command": "/sbin/halt -p",
-      "ssh_password": "{{ user `ssh_password` }}",
-      "ssh_port": "22",
-      "ssh_username": "{{ user `ssh_username` }}",
-      "ssh_wait_timeout": "600s",
-      "vboxmanage": [
-        [ "modifyvm", "{{ .Name }}", "--memory", "1024" ],
-        [ "modifyvm", "{{ .Name }}", "--cpus", "2" ],
-        [ "modifyvm", "{{ .Name }}", "--audio", "none" ]
-      ],
-      "vm_name": "Centos_7_x64_Server_Base"
-    },
-    {
-      "type": "vmware-iso",
-      "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos_ks.cfg<enter><wait>" ],
-      "communicator": "ssh",
-      "disk_size": "20480",
-      "guest_os_type": "centos-64",
-      "headless": "{{ user `headless`}}",
-      "http_directory": "Unattended",
-      "iso_checksum": "{{ user `iso_checksum` }}",
-      "iso_checksum_type": "{{ user `iso_checksum_type` }}",
-      "iso_url": "{{ user `iso` }}",
-      "shutdown_command": "/sbin/halt -p",
-      "ssh_password": "{{ user `ssh_password` }}",
-      "ssh_port": "22",
-      "ssh_username": "{{ user `ssh_username` }}",
-      "ssh_wait_timeout": "600s",
-      "tools_upload_flavor": "linux",
-      "version": "12",
-      "vm_name": "Centos_7_x64_Server_Base",
-      "vmx_data": {
-        "cpuid.coresPerSocket": "2",
-        "memsize": "1024",
-        "numvcpus": "1",
-        "scsi0.virtualDev": "lsisas1068"
-      },
-      "vnc_port_max": "5980",
-      "vnc_port_min": "5900"
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>" ],
+            "communicator": "ssh",
+            "disk_size": "20480",
+            "guest_additions_mode": "attach",
+            "guest_os_type": "RedHat_64",
+            "headless": "{{ user `headless`}}",
+            "http_directory": "Unattended",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "iso_url": "{{ user `iso` }}",
+            "shutdown_command": "/sbin/halt -p",
+            "ssh_password": "{{ user `ssh_password` }}",
+            "ssh_port": "22",
+            "ssh_username": "{{ user `ssh_username` }}",
+            "ssh_wait_timeout": "600s",
+            "vboxmanage": [
+                [ "modifyvm", "{{ .Name }}", "--memory", "1024" ],
+                [ "modifyvm", "{{ .Name }}", "--cpus", "2" ],
+                [ "modifyvm", "{{ .Name }}", "--audio", "none" ]
+            ],
+            "vm_name": "Centos_7_x64_Server_Base"
+        },
+        {
+            "type": "vmware-iso",
+            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos_ks.cfg<enter><wait>" ],
+            "communicator": "ssh",
+            "disk_size": "20480",
+            "guest_os_type": "centos-64",
+            "headless": "{{ user `headless`}}",
+            "http_directory": "Unattended",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "iso_url": "{{ user `iso` }}",
+            "shutdown_command": "/sbin/halt -p",
+            "ssh_password": "{{ user `ssh_password` }}",
+            "ssh_port": "22",
+            "ssh_username": "{{ user `ssh_username` }}",
+            "ssh_wait_timeout": "600s",
+            "tools_upload_flavor": "linux",
+            "version": "12",
+            "vm_name": "Centos_7_x64_Server_Base",
+            "vmx_data": {
+                "cpuid.coresPerSocket": "2",
+                "memsize": "1024",
+                "numvcpus": "1",
+                "scsi0.virtualDev": "lsisas1068"
+            },
+            "vnc_port_max": "5980",
+            "vnc_port_min": "5900"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "expect_disconnect": true,
+            "remote_path": "/root/centos_update.sh",
+            "scripts": [
+                "./Scripts/centos_update.sh"
+            ]
+        },
+        {
+            "type": "file",
+            "destination": "/root/.bashrc",
+            "source": "./Files/centos_bashrc_root"
+            
+        },
+        {
+            "type": "file",
+            "destination": "/home/cpt/.bashrc",
+            "source": "./Files/centos_bashrc_cpt"
+          
+        },
+        {
+            "type": "file",
+            "destination": "/root/.nanorc",
+            "source": "./Files/nanorc"
+          
+        },
+        {
+            "type": "file",
+            "destination": "/home/cpt/.nanorc",
+            "source": "./Files/nanorc"
+            
+        },
+        {
+            "type": "shell",
+            "remote_path": "/root/centos_bootstrap.sh",
+            "scripts": [
+                "./Scripts/centos_bootstrap.sh"
+            ]
+            
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "compress",
+            "compression_level": "9",
+            "format": ".zip",
+            "output": "./Output/centos_7_x64_server.zip"
+        }
+    ],
+    "variables": {
+        "headless": "false",
+        "iso": "http://mirrors.ocf.berkeley.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso",
+        "iso_checksum": "bba314624956961a2ea31dd460cd860a77911c1e0a56e4820a12b9c5dad363f5",
+        "iso_checksum_type": "sha256",
+        "ssh_password": "toor",
+        "ssh_username": "root"
     }
-  ],
-  "post-processors": [
-    {
-      "compression_level": "9",
-      "format": ".zip",
-      "output": "./Output/centos_7_x64_server.zip",
-      "type": "compress"
-    }
-  ],
-  "provisioners": [
-    {
-      "expect_disconnect": true,
-      "remote_path": "/root/centos_update.sh",
-      "scripts": [
-        "./Scripts/centos_update.sh"
-      ],
-      "type": "shell"
-    },
-    {
-      "destination": "/root/.bashrc",
-      "source": "./Files/centos_bashrc_root",
-      "type": "file"
-    },
-    {
-      "destination": "/home/cpt/.bashrc",
-      "source": "./Files/centos_bashrc_cpt",
-      "type": "file"
-    },
-    {
-      "destination": "/root/.nanorc",
-      "source": "./Files/nanorc",
-      "type": "file"
-    },
-    {
-      "destination": "/home/cpt/.nanorc",
-      "source": "./Files/nanorc",
-      "type": "file"
-    },
-    {
-      "remote_path": "/root/centos_bootstrap.sh",
-      "scripts": [
-        "./Scripts/centos_bootstrap.sh"
-      ],
-      "type": "shell"
-    }
-  ],
-  "variables": {
-    "headless": "false",
-    "iso": "http://mirrors.ocf.berkeley.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso",
-    "iso_checksum": "bba314624956961a2ea31dd460cd860a77911c1e0a56e4820a12b9c5dad363f5",
-    "iso_checksum_type": "sha256",
-    "ssh_password": "toor",
-    "ssh_username": "root"
-  }
 }
