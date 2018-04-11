@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-USER_ACCOUNT="cpt"
-
 unset HISTFILE
 
 # Install software
@@ -28,14 +26,13 @@ wget -O /usr/bin/update https://raw.githubusercontent.com/fights-on/update-scrip
 chmod +x /usr/bin/update
 
 # Fix bashrc's permissions
+sudo mv /tmp/.bashrc /root/.bashrc
+sudo mv /tmp/.nanorc /root/.nanorc
 echo "Applying .bashrc's..."
-sudo chown $USER_ACCOUNTt:$USER_ACCOUNT /home/$USER_ACCOUNT/.bashrc
-sudo chown $USER_ACCOUNT:$USER_ACCOUNT /home/$USER_ACCOUNT/.nanorc
+sudo chown $USER:$USER /home/$USER/.bashrc
+sudo chown $USER:$USER /home/$USER/.nanorc
 sudo chown root:root /root/.bashrc
 sudo chown root:root /root/.nanorc
-
-# Install update script
-
 
 # Clean up
 echo "Cleaning up..."

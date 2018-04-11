@@ -12,7 +12,7 @@
             "iso_checksum": "{{ user `iso_checksum` }}",
             "iso_checksum_type": "{{ user `iso_checksum_type` }}",
             "iso_url": "{{ user `iso` }}",
-            "shutdown_command": "/sbin/halt -p",
+            "shutdown_command": "echo '{{ user `ssh_password`}}' | sudo -S /sbin/halt -h -p",
             "ssh_password": "{{ user `ssh_password` }}",
             "ssh_port": "22",
             "ssh_username": "{{ user `ssh_username` }}",
@@ -35,7 +35,7 @@
             "iso_checksum": "{{ user `iso_checksum` }}",
             "iso_checksum_type": "{{ user `iso_checksum_type` }}",
             "iso_url": "{{ user `iso` }}",
-            "shutdown_command": "/sbin/halt -p",
+            "shutdown_command": "echo '{{ user `ssh_password`}}' | sudo -S /sbin/halt -h -p",
             "ssh_password": "{{ user `ssh_password` }}",
             "ssh_port": "22",
             "ssh_username": "{{ user `ssh_username` }}",
@@ -56,43 +56,44 @@
     "provisioners": [
         {
             "type": "shell",
+            "execute_command": "echo '{{ user `ssh_password`}}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
             "expect_disconnect": true,
-            "remote_path": "/root/centos_update.sh",
-            "scripts": [
-                "./Scripts/centos_update.sh"
-            ]
-        },
-        {
-            "type": "file",
-            "destination": "/root/.bashrc",
-            "source": "./Files/centos_bashrc_root"
-            
-        },
-        {
-            "type": "file",
-            "destination": "/home/cpt/.bashrc",
-            "source": "./Files/centos_bashrc_cpt"
-          
-        },
-        {
-            "type": "file",
-            "destination": "/root/.nanorc",
-            "source": "./Files/nanorc"
-          
-        },
-        {
-            "type": "file",
-            "destination": "/home/cpt/.nanorc",
-            "source": "./Files/nanorc"
-            
+            "script": "./Scripts/centos_update.sh"
         },
         {
             "type": "shell",
-            "remote_path": "/root/centos_bootstrap.sh",
-            "scripts": [
-                "./Scripts/centos_bootstrap.sh"
-            ]
-            
+            "execute_command": "echo '{{ user `ssh_password`}}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
+            "expect_disconnect": true,
+            "script": "./Scripts/centos_vm_guest_tools.sh"
+        },
+        {
+            "type": "file",
+            "destination": "/tmp/.bashrc",
+            "source": "./Files/centos_bashrc_root"
+
+        },
+        {
+            "type": "file",
+            "destination": "/home/'{{ user `ssh_username` }}'/.bashrc",
+            "source": "./Files/centos_bashrc_cpt"
+
+        },
+        {
+            "type": "file",
+            "destination": "/tmp/.nanorc",
+            "source": "./Files/nanorc"
+
+        },
+        {
+            "type": "file",
+            "destination": "/home/'{{ user `ssh_username` }}'/.nanorc",
+            "source": "./Files/nanorc"
+
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo '{{ user `ssh_password` }}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
+            "script": "./Scripts/centos_bootstrap.sh"
         }
     ],
     "post-processors": [
@@ -100,7 +101,7 @@
             "type": "compress",
             "compression_level": "9",
             "format": ".zip",
-            "output": "./Output/centos_7_x64_server.zip"
+            "output": "./Output/centos_7_x64_server_{{ .Provider }}.zip"
         }
     ],
     "variables": {
@@ -108,7 +109,7 @@
         "iso": "http://mirrors.ocf.berkeley.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso",
         "iso_checksum": "bba314624956961a2ea31dd460cd860a77911c1e0a56e4820a12b9c5dad363f5",
         "iso_checksum_type": "sha256",
-        "ssh_password": "toor",
-        "ssh_username": "root"
+        "ssh_password": "vagrant",
+        "ssh_username": "vagrant"
     }
 }
