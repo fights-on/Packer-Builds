@@ -26,7 +26,7 @@
         },
         {
             "type": "vmware-iso",
-            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos_ks.cfg<enter><wait>" ],
+            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>" ],
             "communicator": "ssh",
             "disk_size": "20480",
             "guest_os_type": "centos-64",
