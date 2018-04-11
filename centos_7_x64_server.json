@@ -2,7 +2,7 @@
     "builders": [
         {
             "type": "virtualbox-iso",
-            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>" ],
+            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/CentOS/ks.cfg<enter><wait>" ],
             "communicator": "ssh",
             "disk_size": "20480",
             "guest_additions_mode": "attach",
@@ -26,7 +26,7 @@
         },
         {
             "type": "vmware-iso",
-            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos/ks.cfg<enter><wait>" ],
+            "boot_command": [ "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/CentOS/ks.cfg<enter><wait>" ],
             "communicator": "ssh",
             "disk_size": "20480",
             "guest_os_type": "centos-64",
@@ -58,42 +58,42 @@
             "type": "shell",
             "execute_command": "echo '{{ user `ssh_password`}}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
             "expect_disconnect": true,
-            "script": "./Scripts/centos_update.sh"
+            "script": "./Scripts/CentOS/centos_update.sh"
         },
         {
             "type": "shell",
             "execute_command": "echo '{{ user `ssh_password`}}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
             "expect_disconnect": true,
-            "script": "./Scripts/centos_vm_guest_tools.sh"
+            "script": "./Scripts/CentOS/centos_vm_guest_tools.sh"
         },
         {
             "type": "file",
             "destination": "/tmp/.bashrc",
-            "source": "./Files/centos_bashrc_root"
+            "source": "./Files/CentOS/centos_bashrc_root"
 
         },
         {
             "type": "file",
             "destination": "/home/'{{ user `ssh_username` }}'/.bashrc",
-            "source": "./Files/centos_bashrc_cpt"
+            "source": "./Files/CentOS/centos_bashrc_cpt"
 
         },
         {
             "type": "file",
             "destination": "/tmp/.nanorc",
-            "source": "./Files/nanorc"
+            "source": "./Files/CentOS/nanorc"
 
         },
         {
             "type": "file",
             "destination": "/home/'{{ user `ssh_username` }}'/.nanorc",
-            "source": "./Files/nanorc"
+            "source": "./Files/CentOS/nanorc"
 
         },
         {
             "type": "shell",
             "execute_command": "echo '{{ user `ssh_password` }}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
-            "script": "./Scripts/centos_bootstrap.sh"
+            "script": "./Scripts/CentOS/centos_bootstrap.sh"
         }
     ],
     "post-processors": [
