@@ -32,6 +32,10 @@ chmod +x /usr/bin/update
 mv /tmp/.bashrc /root/.bashrc
 mv /tmp/.nanorc /root/.nanorc
 echo "Applying .bashrc's..."
+sed -i 's/\x0D$//' /home/$SUDO_USER/.bashrc
+sed -i 's/\x0D$//' /home/$SUDO_USER/.nanorc
+sed -i 's/\x0D$//' /root/.bashrc
+sed -i 's/\x0D$//' /root/.nanorc
 chown $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.bashrc
 chown $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.nanorc
 chown root:root /root/.bashrc

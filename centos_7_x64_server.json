@@ -40,13 +40,13 @@
             "ssh_port": "22",
             "ssh_username": "{{ user `ssh_username` }}",
             "ssh_wait_timeout": "600s",
-            "tools_upload_flavor": "linux",
             "version": "12",
             "vm_name": "Centos_7_x64_Server_Base",
             "vmx_data": {
-                "cpuid.coresPerSocket": "2",
+                "vcpu.hotadd": "TRUE",
+                "mem.hotadd": "TRUE",
                 "memsize": "1024",
-                "numvcpus": "1",
+                "numvcpus": "2",
                 "scsi0.virtualDev": "lsisas1068"
             },
             "vnc_port_max": "5980",
@@ -101,7 +101,7 @@
             "type": "compress",
             "compression_level": "9",
             "format": ".zip",
-            "output": "./Output/centos_7_x64_server_{{ .Provider }}.zip"
+            "output": "./Output/centos_7_x64_server_{{ .BuilderType }}.zip"
         }
     ],
     "variables": {
